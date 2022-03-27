@@ -1,0 +1,80 @@
+from dictionary.word_frequency import WordFrequency
+from dictionary.base_dictionary import BaseDictionary
+
+
+# ------------------------------------------------------------------------
+# This class is required TO BE IMPLEMENTED. List-based dictionary implementation.
+#
+# __author__ = 'Son Hoang Dau'
+# __copyright__ = 'Copyright 2022, RMIT University'
+# ------------------------------------------------------------------------
+
+class ListDictionary(BaseDictionary):
+    __slots__ = 'dictionary'
+
+    def __init__(self):
+        self.dictionary = []
+
+    def build_dictionary(self, words_frequencies: [WordFrequency]):
+        """
+        construct the data structure to store nodes
+        @param words_frequencies: list of (word, frequency) to be stored
+        """
+        # TO BE IMPLEMENTED
+        for word_frequency in words_frequencies:
+            self.add_word_frequency(word_frequency)
+
+    def search(self, word: str) -> int:
+        """
+        search for a word
+        @param word: the word to be searched
+        @return: frequency > 0 if found and 0 if NOT found
+        """
+        # TO BE IMPLEMENTED
+        for word_frequency in self.dictionary:
+            if word_frequency.word == word:
+                return word_frequency.frequency
+        return 0
+
+    def add_word_frequency(self, word_frequency: WordFrequency) -> bool:
+        """
+        add a word and its frequency to the dictionary
+        @param word_frequency: (word, frequency) to be added
+        :return: True whether succeeded, False when word is already in the dictionary
+        """
+        # TO BE IMPLEMENTED
+        # If word is not in the dictionary than add it to the dictionary.
+        if self.search(word_frequency.word) == 0:
+            self.dictionary.append(word_frequency)
+            return True
+        return False
+
+    def delete_word(self, word: str) -> bool:
+        """
+        delete a word from the dictionary
+        @param word: word to be deleted
+        @return: whether succeeded, e.g. return False when point not found
+        """
+        # TO BE IMPLEMENTED
+        # If word is in the dictionary than delete it from the dictionary.
+        if self.search(word) > 0:
+            for word_frequency in self.dictionary:
+                if word_frequency.word == word:
+                    self.dictionary.remove(word_frequency)
+                    return True
+        return False
+
+    def autocomplete(self, prefix_word: str) -> [str]:
+        """
+        return a list of 3 most-frequent words in the dictionary that have 'prefix_word' as a prefix
+        @param prefix_word: word to be autocompleted
+        @return: a list (could be empty) of (at most) 3 most-frequent words with prefix 'prefix_word'
+        """
+        # Add words to the frequency_list that have 'prefix_word' as a prefix.
+        frequency_list = []
+        for word_frequency in self.dictionary:
+            if word_frequency.word.startswith(prefix_word):
+                frequency_list.append(word_frequency)
+        # Sort the list by frequency and return the top 3.
+        frequency_list.sort(key=lambda x: x.frequency, reverse=True)
+        return frequency_list[:3]
