@@ -9,9 +9,14 @@ from dictionary.node import Node
 # __author__ = 'Son Hoang Dau'
 # __copyright__ = 'Copyright 2022, RMIT University'
 # ------------------------------------------------------------------------
+# Implement Ternary Search tree
+
 
 
 class TernarySearchTreeDictionary(BaseDictionary):
+
+    def __init__(self):
+        self.root = None
 
     def build_dictionary(self, words_frequencies: [WordFrequency]):
         """
