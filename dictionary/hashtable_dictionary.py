@@ -1,5 +1,6 @@
-from dictionary.base_dictionary import BaseDictionary
 from dictionary.word_frequency import WordFrequency
+from dictionary.base_dictionary import BaseDictionary
+
 
 
 # ------------------------------------------------------------------------
@@ -10,6 +11,10 @@ from dictionary.word_frequency import WordFrequency
 # ------------------------------------------------------------------------
 
 class HashTableDictionary(BaseDictionary):
+    __slots__ = 'dictionary'
+
+    def __init__(self):
+        self.dictionary = {}
 
     def build_dictionary(self, words_frequencies: [WordFrequency]):
         """
@@ -17,6 +22,8 @@ class HashTableDictionary(BaseDictionary):
         @param words_frequencies: list of (word, frequency) to be stored
         """
         # TO BE IMPLEMENTED
+        for word_frequency in words_frequencies:
+            self.add_word_frequency(word_frequency)
 
     def search(self, word: str) -> int:
         """
@@ -25,7 +32,8 @@ class HashTableDictionary(BaseDictionary):
         @return: frequency > 0 if found and 0 if NOT found
         """
         # TO BE IMPLEMENTED
-        # place holder for return
+        if word in self.dictionary:
+            return self.dictionary[word].frequency
         return 0
 
     def add_word_frequency(self, word_frequency: WordFrequency) -> bool:
@@ -35,7 +43,9 @@ class HashTableDictionary(BaseDictionary):
         :return: True whether succeeded, False when word is already in the dictionary
         """
         # TO BE IMPLEMENTED
-        # place holder for return
+        if word_frequency.word not in self.dictionary:
+            self.dictionary[word_frequency.word] = word_frequency
+            return True
         return False
 
     def delete_word(self, word: str) -> bool:
@@ -45,7 +55,9 @@ class HashTableDictionary(BaseDictionary):
         @return: whether succeeded, e.g. return False when point not found
         """
         # TO BE IMPLEMENTED
-        # place holder for return
+        if word in self.dictionary:
+            self.dictionary.pop(word)
+            return True
         return False
 
     def autocomplete(self, word: str) -> [str]:
@@ -55,5 +67,6 @@ class HashTableDictionary(BaseDictionary):
         @return: a list (could be empty) of (at most) 3 most-frequent words with prefix 'word'
         """
         # TO BE IMPLEMENTED
-        # place holder for return
-        return []
+        frequency_list = [self.dictionary[w] for w in self.dictionary if w.startswith(word)]
+        frequency_list.sort(key=lambda x: x.frequency, reverse=True)
+        return frequency_list[:3]
