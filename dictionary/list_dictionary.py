@@ -20,9 +20,8 @@ class ListDictionary(BaseDictionary):
         construct the data structure to store nodes
         @param words_frequencies: list of (word, frequency) to be stored
         """
-        # TO BE IMPLEMENTED
         for word_frequency in words_frequencies:
-            self.add_word_frequency(word_frequency)
+            self.dictionary.append(word_frequency)
 
     def search(self, word: str) -> int:
         """
@@ -30,7 +29,6 @@ class ListDictionary(BaseDictionary):
         @param word: the word to be searched
         @return: frequency > 0 if found and 0 if NOT found
         """
-        # TO BE IMPLEMENTED
         for word_frequency in self.dictionary:
             if word_frequency.word == word:
                 return word_frequency.frequency
@@ -55,7 +53,6 @@ class ListDictionary(BaseDictionary):
         @param word: word to be deleted
         @return: whether succeeded, e.g. return False when point not found
         """
-        # TO BE IMPLEMENTED
         # If word is in the dictionary than delete it from the dictionary.
         if self.search(word) > 0:
             for word_frequency in self.dictionary:
@@ -71,10 +68,8 @@ class ListDictionary(BaseDictionary):
         @return: a list (could be empty) of (at most) 3 most-frequent words with prefix 'prefix_word'
         """
         # Add words to the frequency_list that have 'prefix_word' as a prefix.
-        frequency_list = []
-        for word_frequency in self.dictionary:
-            if word_frequency.word.startswith(prefix_word):
-                frequency_list.append(word_frequency)
+        frequency_list = [word_frequency for word_frequency in self.dictionary
+                          if word_frequency.word.startswith(prefix_word)]
         # Sort the list by frequency and return the top 3.
         frequency_list.sort(key=lambda x: x.frequency, reverse=True)
         return frequency_list[:3]

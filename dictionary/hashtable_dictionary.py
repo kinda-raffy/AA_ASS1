@@ -2,7 +2,6 @@ from dictionary.word_frequency import WordFrequency
 from dictionary.base_dictionary import BaseDictionary
 
 
-
 # ------------------------------------------------------------------------
 # This class is required TO BE IMPLEMENTED. Hash-table-based dictionary.
 #
@@ -21,7 +20,6 @@ class HashTableDictionary(BaseDictionary):
         construct the data structure to store nodes
         @param words_frequencies: list of (word, frequency) to be stored
         """
-        # TO BE IMPLEMENTED
         for word_frequency in words_frequencies:
             self.add_word_frequency(word_frequency)
 
@@ -31,7 +29,6 @@ class HashTableDictionary(BaseDictionary):
         @param word: the word to be searched
         @return: frequency > 0 if found and 0 if NOT found
         """
-        # TO BE IMPLEMENTED
         if word in self.dictionary:
             return self.dictionary[word].frequency
         return 0
@@ -42,7 +39,6 @@ class HashTableDictionary(BaseDictionary):
         @param word_frequency: (word, frequency) to be added
         :return: True whether succeeded, False when word is already in the dictionary
         """
-        # TO BE IMPLEMENTED
         if word_frequency.word not in self.dictionary:
             self.dictionary[word_frequency.word] = word_frequency
             return True
@@ -54,7 +50,6 @@ class HashTableDictionary(BaseDictionary):
         @param word: word to be deleted
         @return: whether succeeded, e.g. return False when point not found
         """
-        # TO BE IMPLEMENTED
         if word in self.dictionary:
             self.dictionary.pop(word)
             return True
@@ -66,7 +61,6 @@ class HashTableDictionary(BaseDictionary):
         @param word: word to be autocompleted
         @return: a list (could be empty) of (at most) 3 most-frequent words with prefix 'word'
         """
-        # TO BE IMPLEMENTED
         frequency_list = [self.dictionary[w] for w in self.dictionary if w.startswith(word)]
         frequency_list.sort(key=lambda x: x.frequency, reverse=True)
         return frequency_list[:3]
