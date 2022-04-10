@@ -1,3 +1,5 @@
+from treelib import Node, Tree
+
 from dictionary.base_dictionary import BaseDictionary
 from dictionary.word_frequency import WordFrequency
 from dictionary.node import Node
@@ -9,6 +11,24 @@ from dictionary.node import Node
 # __author__ = 'Son Hoang Dau'
 # __copyright__ = 'Copyright 2022, RMIT University'
 # ------------------------------------------------------------------------
+
+
+def print_tree(curr_) -> None:
+    tree = Tree()
+
+    def pre_order_traversal(curr, parent):
+        if curr:
+            if parent is None:
+                parent = tree.create_node(curr.letter.capitalize())
+            else:
+                parent = tree.create_node(curr.letter.capitalize(), parent=parent)
+
+            pre_order_traversal(curr.left, parent)
+            pre_order_traversal(curr.middle, parent)
+            pre_order_traversal(curr.right, parent)
+
+    pre_order_traversal(curr_, None)
+    tree.show(reverse=False)
 
 
 class TernarySearchTreeDictionary(BaseDictionary):
@@ -159,17 +179,6 @@ class TernarySearchTreeDictionary(BaseDictionary):
         # place holder for return
         return []
 
-    def pre_order_print(self, curr):
-        """
-        print the tree in a readable format
-        """
-        # Print out tree using pre-order traversal.
-        if curr:
-            print(curr.letter.capitalize(), end=' ')
-            self.pre_order_print(curr.left)
-            self.pre_order_print(curr.middle)
-            self.pre_order_print(curr.right)
-
 
 def debug():
     """
@@ -178,8 +187,7 @@ def debug():
     tst = TernarySearchTreeDictionary()
     tst.build_dictionary([WordFrequency('cut', 10), WordFrequency('app', 20),
                           WordFrequency('cute', 50), WordFrequency('farm', 40), WordFrequency('cup', 30)])
-    tst.pre_order_print(curr=tst.root_)
-    # C A P P U T P E F A R M
+    print_tree(curr_=tst.root_)
 
 
 if __name__ == '__main__':
