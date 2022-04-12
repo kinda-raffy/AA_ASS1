@@ -39,7 +39,6 @@ class TernarySearchTreeDictionary(BaseDictionary):
         # Check if the tree is empty.
         if self.root_ is None:
             return 0
-
         # Search for the word.
         dict_word = ''
         letter_index = 0
@@ -57,20 +56,6 @@ class TernarySearchTreeDictionary(BaseDictionary):
                 curr = curr.left
             elif letter > curr.letter:
                 curr = curr.right
-
-        # while curr is not None:
-        #     if curr.letter == letter:
-        #         letter_index += 1
-        #         if letter_index == len(word):
-        #             return curr.frequency
-        #         letter = word[letter_index]
-        #         curr = curr.middle
-        #     elif curr.letter < letter:
-        #         curr = curr.right
-        #     else:
-        #         curr = curr.left
-
-        # place holder for return
         return 0
 
     def add_word_frequency(self, word_frequency: WordFrequency) -> bool:
