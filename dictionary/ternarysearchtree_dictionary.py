@@ -17,7 +17,6 @@ class TernarySearchTreeDictionary(BaseDictionary):
     __slots__ = 'root_'
 
     def __init__(self):
-        # Initialise the tree
         self.root_ = None
 
     def build_dictionary(self, words_frequencies: [WordFrequency]):
@@ -30,14 +29,14 @@ class TernarySearchTreeDictionary(BaseDictionary):
         for word_frequency in words_frequencies:
             self.add_word_frequency(word_frequency)
 
-    def search(self, word: str) -> int:
+    def search(self, word: str, return_node=False) -> int:
         """
         search for a word
         @param word: the word to be searched
         @return: frequency > 0 if found and 0 if NOT found
         """
         # Check if the tree is empty.
-        if self.root_ is None:
+        if self.root_ is None or word == '':
             return 0
         # Search for the word.
         dict_word = ''
@@ -47,8 +46,8 @@ class TernarySearchTreeDictionary(BaseDictionary):
         while curr is not None:
             if letter == curr.letter:
                 dict_word += letter
-                if dict_word == word:
-                    return curr.frequency
+                if dict_word == word and (curr.end_word if not return_node else True):
+                    return curr.frequency if not return_node else (curr.frequency, curr)
                 letter_index += 1
                 letter = word[letter_index]
                 curr = curr.middle
@@ -64,9 +63,13 @@ class TernarySearchTreeDictionary(BaseDictionary):
         @param word_frequency: (word, frequency) to be added
         :return: True whether succeeded, False when word is already in the dictionary
         """
-        letter_index = 0
         word = word_frequency.word
         frequency = word_frequency.frequency
+        # Check if the word is already in the tree.
+        if self.search(word_frequency.word) > 0:
+            return False
+        # If the tree is empty; else if the tree is not empty.
+        letter_index = 0
         if self.root_ is None:
             self.root_ = Node(letter=word[letter_index]) if len(word) != 1 \
                 else Node(letter=word[letter_index], frequency=frequency, end_word=True)
@@ -103,10 +106,7 @@ class TernarySearchTreeDictionary(BaseDictionary):
             current = Node(letter) if i < (len(word) - 1) else Node(letter=letter, frequency=frequency, end_word=True)
             parent.middle = current
             parent = current
-
-        # return True
-        # place holder for return
-        # return False
+        return True
 
     def delete_word(self, word: str) -> bool:
         """
@@ -124,9 +124,32 @@ class TernarySearchTreeDictionary(BaseDictionary):
         @param word: word to be autocompleted
         @return: a list (could be empty) of (at most) 3 most-frequent words with prefix 'word'
         """
-        # TO BE IMPLEMENTED
-        # place holder for return
-        return []
+        # Search for the prefix
+        if word == '':
+            return []
+        _, end_prefix = self.search(word, return_node=True)
+        if end_prefix is None:
+            return []
+
+        list_word = []
+        _curr = end_prefix
+
+        def _autocomplete(curr: Node, w):
+            if curr is None:
+                return
+
+            # w += curr.letter if curr is not end_prefix else ''
+            if curr.end_word:
+                list_word.append(WordFrequency(w + curr.letter, curr.frequency))
+
+            _autocomplete(curr.left, w)
+            _autocomplete(curr.middle, w + curr.letter)
+            _autocomplete(curr.right, w)
+
+        _autocomplete(_curr.middle, word)
+
+        list_word.sort(key=lambda x: x.frequency, reverse=True)
+        return list_word[:3]
 
     @staticmethod
     def grab_parent_node(w, f, i):
@@ -148,21 +171,30 @@ class TernarySearchTreeDictionary(BaseDictionary):
                 pre_order_traversal(curr.left, parent)
                 pre_order_traversal(curr.middle, parent)
                 pre_order_traversal(curr.right, parent)
+
         # Call recursive function.
         pre_order_traversal(curr_, None)
         tree.show(reverse=False)
 
 
 def debug():
-    """
-    A function to test the implementation of the Ternary Search Tree
-    """
+    wf_dict = [WordFrequency('cut', 10),
+               WordFrequency('app', 20),
+               # WordFrequency('pneumonoultramicroscopicsilicovolcanoconiosis', 20),
+               WordFrequency('cute', 50),
+               # WordFrequency('comfy', 100),
+               # WordFrequency('couch', 500),
+               # WordFrequency('computer', 90),
+               # WordFrequency('adrian', 50),
+               # WordFrequency('raf', 50),
+               WordFrequency('farm', 40),
+               WordFrequency('cup', 30)]
+
     tst = TernarySearchTreeDictionary()
-    tst.build_dictionary([WordFrequency('cut', 10), WordFrequency('app', 20),
-                          WordFrequency('cute', 50), WordFrequency('farm', 40), WordFrequency('cup', 30)])
+    tst.build_dictionary(wf_dict)
     tst.print_tree(curr_=tst.root_)
-    print(f" cut - {tst.search('cut')}\n"
-          f" raf - {tst.search('raf')}")
+
+    [print(x.word, x.frequency) for x in tst.autocomplete('c')]
 
 
 if __name__ == '__main__':
