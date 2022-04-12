@@ -13,25 +13,8 @@ from dictionary.node import Node
 # ------------------------------------------------------------------------
 
 
-def print_tree(curr_) -> None:
-    tree = Tree()
-
-    def pre_order_traversal(curr, parent):
-        if curr:
-            if parent is None:
-                parent = tree.create_node(curr.letter.capitalize())
-            else:
-                parent = tree.create_node(curr.letter.capitalize(), parent=parent)
-
-            pre_order_traversal(curr.left, parent)
-            pre_order_traversal(curr.middle, parent)
-            pre_order_traversal(curr.right, parent)
-
-    pre_order_traversal(curr_, None)
-    tree.show(reverse=False)
-
-
 class TernarySearchTreeDictionary(BaseDictionary):
+    __slots__ = 'root_'
 
     def __init__(self):
         # Initialise the tree
@@ -53,7 +36,40 @@ class TernarySearchTreeDictionary(BaseDictionary):
         @param word: the word to be searched
         @return: frequency > 0 if found and 0 if NOT found
         """
-        # TO BE IMPLEMENTED
+        # Check if the tree is empty.
+        if self.root_ is None:
+            return 0
+
+        # Search for the word.
+        dict_word = ''
+        letter_index = 0
+        letter = word[letter_index]
+        curr = self.root_
+        while curr is not None:
+            if letter == curr.letter:
+                dict_word += letter
+                if dict_word == word:
+                    return curr.frequency
+                letter_index += 1
+                letter = word[letter_index]
+                curr = curr.middle
+            elif letter < curr.letter:
+                curr = curr.left
+            elif letter > curr.letter:
+                curr = curr.right
+
+        # while curr is not None:
+        #     if curr.letter == letter:
+        #         letter_index += 1
+        #         if letter_index == len(word):
+        #             return curr.frequency
+        #         letter = word[letter_index]
+        #         curr = curr.middle
+        #     elif curr.letter < letter:
+        #         curr = curr.right
+        #     else:
+        #         curr = curr.left
+
         # place holder for return
         return 0
 
@@ -64,96 +80,44 @@ class TernarySearchTreeDictionary(BaseDictionary):
         :return: True whether succeeded, False when word is already in the dictionary
         """
         letter_index = 0
+        word = word_frequency.word
+        frequency = word_frequency.frequency
         if self.root_ is None:
-            self.root_ = Node(letter=word_frequency.word[letter_index]) if len(word_frequency.word) != 1 \
-                else Node(letter=word_frequency.word[letter_index], frequency=word_frequency.frequency, end_word=True)
+            self.root_ = Node(letter=word[letter_index]) if len(word) != 1 \
+                else Node(letter=word[letter_index], frequency=frequency, end_word=True)
             letter_index += 1
-            root = self.root_
+            parent = self.root_
         else:
-            root = None
+            parent = None
             iter_node = self.root_
-            while root is None:
-                letter = word_frequency.word[letter_index]
+            while parent is None:
+                letter = word[letter_index]
                 if letter < iter_node.letter:
                     if iter_node.left is not None:
                         iter_node = iter_node.left
                     else:
-                        iter_node.left = Node(letter=letter)
-                        root = iter_node.left
+                        iter_node.left = self.grab_parent_node(word, frequency, letter_index)
+                        parent = iter_node.left
                         letter_index += 1
                 elif letter > iter_node.letter:
                     if iter_node.right is not None:
                         iter_node = iter_node.right
                     else:
-                        iter_node.right = Node(letter=letter)
-                        root = iter_node.right
+                        iter_node.right = self.grab_parent_node(word, frequency, letter_index)
+                        parent = iter_node.right
                         letter_index += 1
                 elif letter == iter_node.letter:
                     if iter_node.middle is not None:
                         iter_node = iter_node.middle
                         letter_index += 1
                     else:
-                        root = iter_node
+                        parent = iter_node
                         letter_index += 1
 
-        # FIXME - Will this run with single words?
-        for i, letter in enumerate(word_frequency.word[letter_index:], start=letter_index):
-            current = Node(letter=letter) if i < len(word_frequency.word) - 1 \
-                else Node(letter=letter, frequency=word_frequency.frequency, end_word=True)
-            root.middle = current
-            root = current
-
-
-            # TO BE IMPLEMENTED
-            # # Add first letter to tree if it doesn't exist.
-            # if self.root is None:
-            #     # Set parent to root.
-            #     self.root = Node(letter=word_frequency.word[0], frequency=None, end_word=False)
-            #     parent = self.root
-            # else:
-            #     letter = word_frequency.word[0]
-            #     iter_node = self.root
-            #     # Set parent to last available prefix letter in the tree.
-            #     while True:
-            #         # If letter is found, set parent to that node.
-            #         if letter == iter_node.letter:
-            #             parent = iter_node
-            #             break
-            #         # If letter is lower than current iteration, move left.
-            #         elif letter < iter_node.letter:
-            #             # If left child is None, create new node; else iterate through left child.
-            #             if iter_node.left is None:
-            #                 iter_node.left = Node(letter=letter, frequency=None, end_word=False)
-            #                 parent = iter_node.left
-            #                 break
-            #             else:
-            #                 iter_node = iter_node.left
-            #         # If letter is higher than current iteration, move right.
-            #         elif letter > iter_node.letter:
-            #             # If right child is None, create new node; else iterate through right child.
-            #             if iter_node.right is None:
-            #                 iter_node.right = Node(letter=letter, frequency=None, end_word=False)
-            #                 parent = iter_node.right
-            #                 break
-            #             else:
-            #                 iter_node = iter_node.right
-            #         pass
-            #
-            # # Add rest of the word to tree.
-            # for i, letter in enumerate(word_frequency.word[1:]):
-            #     # Set the current node to the current letter.
-            #     current = Node(letter=letter, frequency=None, end_word=False) if i < len(word_frequency.word) - 2 \
-            #         else Node(letter=letter, frequency=word_frequency.frequency, end_word=True)
-            #     # Add the current node to the tree.
-            #     parent.middle(current)
-            #     # if letter > parent.letter:
-            #     #     parent.right = current
-            #     # elif letter < parent.letter:
-            #     #     parent.left = current
-            #     # elif letter == parent.letter:
-            #     #     parent.middle = current
-            #     # Set the parent node to the current node for next iterations.
-            #     parent = current
+        for i, letter in enumerate(word[letter_index:], start=letter_index):
+            current = Node(letter) if i < (len(word) - 1) else Node(letter=letter, frequency=frequency, end_word=True)
+            parent.middle = current
+            parent = current
 
         # return True
         # place holder for return
@@ -169,7 +133,7 @@ class TernarySearchTreeDictionary(BaseDictionary):
         # place holder for return
         return False
 
-    def autocomplete(self, word: str) -> [str]:
+    def autocomplete(self, word: str) -> [WordFrequency]:
         """
         return a list of 3 most-frequent words in the dictionary that have 'word' as a prefix
         @param word: word to be autocompleted
@@ -179,6 +143,30 @@ class TernarySearchTreeDictionary(BaseDictionary):
         # place holder for return
         return []
 
+    @staticmethod
+    def grab_parent_node(w, f, i):
+        return Node(letter=w[i]) if (len(w) - 1) != i else Node(letter=w[i], frequency=f, end_word=True)
+
+    @staticmethod
+    def print_tree(curr_) -> None:
+        tree = Tree()
+
+        def pre_order_traversal(curr, parent):
+            # Set nodes to be printed.
+            if curr:
+                if parent is None:
+                    parent = tree.create_node(f"({curr.letter.capitalize()}, {curr.frequency}, {curr.end_word})")
+                else:
+                    parent = tree.create_node(f"({curr.letter.capitalize()}, {curr.frequency}, {curr.end_word})",
+                                              parent=parent)
+                # Recursive call.
+                pre_order_traversal(curr.left, parent)
+                pre_order_traversal(curr.middle, parent)
+                pre_order_traversal(curr.right, parent)
+        # Call recursive function.
+        pre_order_traversal(curr_, None)
+        tree.show(reverse=False)
+
 
 def debug():
     """
@@ -187,7 +175,9 @@ def debug():
     tst = TernarySearchTreeDictionary()
     tst.build_dictionary([WordFrequency('cut', 10), WordFrequency('app', 20),
                           WordFrequency('cute', 50), WordFrequency('farm', 40), WordFrequency('cup', 30)])
-    print_tree(curr_=tst.root_)
+    tst.print_tree(curr_=tst.root_)
+    print(f" cut - {tst.search('cut')}\n"
+          f" raf - {tst.search('raf')}")
 
 
 if __name__ == '__main__':
