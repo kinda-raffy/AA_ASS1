@@ -115,8 +115,65 @@ class TernarySearchTreeDictionary(BaseDictionary):
         @return: whether succeeded, e.g. return False when point not found
         """
         # TO BE IMPLEMENTED
-        # place holder for return
-        return False
+
+        # Recursive Implementation. We need to delete end nodes that are not part of another word.
+        # We will begin at the start of the word, and recursively look for the correct child node.
+        # We cull this node if the child recursive call returns True, and this node has no other children.
+
+        return_value = False
+
+        if word == '':
+            return False
+
+        def _delete_word(curr: Node, letters) -> bool:
+
+            # If this node is empty, it counts as deleted.
+            if curr is None:
+                return True
+            # If node is not empty and string is empty, not deleted.
+            if letters == "":
+                return False  
+            # If this node is valid to be deleted
+            valid = True
+            # if this node is th next part of the word
+            if curr.letter == letters[0]:
+                if len(letters) == 1:
+                    valid = _delete_word(curr.middle, "")
+                else:
+                    # Try to delete middle
+                    valid = _delete_word(curr.middle, letters[1:])
+                if valid:
+                    curr.middle = None
+            else:
+                valid = False
+
+            if _delete_word(curr.left, letters):
+                curr.left = None 
+            else: 
+                valid = False
+
+            if _delete_word(curr.right, letters):
+                curr.right = None
+            else:
+                valid = False
+
+            
+            # if L,M,R all deleted or None and this is part of word
+            if valid:
+                del curr
+                # set global success to True
+                self.return_value = True
+                return True
+            else:
+                return False
+
+        _, startNode = self.search(word[0], return_node=True)
+        if startNode is None:
+            return False
+    
+        _delete_word(startNode, word)
+        
+        return return_value
 
     def autocomplete(self, word: str) -> [WordFrequency]:
         """
@@ -182,17 +239,20 @@ def debug():
                WordFrequency('app', 20),
                # WordFrequency('pneumonoultramicroscopicsilicovolcanoconiosis', 20),
                WordFrequency('cute', 50),
-               # WordFrequency('comfy', 100),
-               # WordFrequency('couch', 500),
-               # WordFrequency('computer', 90),
-               # WordFrequency('adrian', 50),
-               # WordFrequency('raf', 50),
+               WordFrequency('comfy', 100),
+               WordFrequency('couch', 500),
+               WordFrequency('computer', 90),
+               WordFrequency('adrian', 50),
+               WordFrequency('raf', 50),
                WordFrequency('farm', 40),
                WordFrequency('cup', 30)]
 
     tst = TernarySearchTreeDictionary()
     tst.build_dictionary(wf_dict)
     tst.print_tree(curr_=tst.root_)
+
+    tst.delete_word('cute')
+    tst.print_tree(curr=tst.root_)
 
     [print(x.word, x.frequency) for x in tst.autocomplete('c')]
 
