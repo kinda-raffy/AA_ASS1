@@ -19,7 +19,8 @@ def log_computation_time(func):
         start = time.perf_counter()
         result = func(*args, **kwargs)
         end = time.perf_counter()
-        cprint(f"{c('Computation time', 'magenta')} of '{c(func.__name__, 'yellow')}': {c(str(end - start), 'green')}", attrs=['bold'])
+        cprint(f"{c(' TST ', 'cyan', attrs=['bold', 'reverse'])} {c('Computation time', 'magenta')} of"
+               f" '{c(func.__name__, 'yellow')}': {c(str(end - start), 'green')}", attrs=['bold'])
         return result
     return wrapper
 
@@ -38,6 +39,8 @@ class TernarySearchTreeDictionary(BaseDictionary):
         """
         for word_frequency in words_frequencies:
             self.add_word_frequency(word_frequency)
+
+        self.print_tree(self.root_)
 
     # @log_computation_time
     def search(self, word: str, return_node=False) -> int:
@@ -101,7 +104,7 @@ class TernarySearchTreeDictionary(BaseDictionary):
                 # Explore left branch.
                 if letter < iter_node.letter:
                     # Set iter to left child if not empty, else, create a new node.
-                    if iter_node.left is not None:
+                    if iter_node.left is not None and letter_index < len(word) - 1:
                         iter_node = iter_node.left
                     else:
                         iter_node.left = self.grab_parent_node(word, frequency, letter_index)
@@ -110,7 +113,7 @@ class TernarySearchTreeDictionary(BaseDictionary):
                 # Explore right branch.
                 elif letter > iter_node.letter:
                     # Set iter to right child if not empty, else, create a new node.
-                    if iter_node.right is not None:
+                    if iter_node.right is not None and letter_index < len(word) - 1:
                         iter_node = iter_node.right
                     else:
                         iter_node.right = self.grab_parent_node(word, frequency, letter_index)
@@ -123,6 +126,9 @@ class TernarySearchTreeDictionary(BaseDictionary):
                         iter_node = iter_node.middle
                         letter_index += 1
                     else:
+                        if letter_index == len(word) - 1:
+                            iter_node.frequency = frequency
+                            iter_node.end_word = True
                         parent = iter_node
                         letter_index += 1
         # Add the remaining letters to the middle branch.
@@ -152,6 +158,8 @@ class TernarySearchTreeDictionary(BaseDictionary):
         prune(self.root_, None)
 
     @log_computation_time
+    # FIXME - Delete word fails to delete when the last letter is not a dead-end (and is connected to other valid
+    #  nodes). In this case, end_word should just be set to False.
     def delete_word(self, word: str) -> bool:
         """
         delete a word from the dictionary
@@ -216,6 +224,9 @@ class TernarySearchTreeDictionary(BaseDictionary):
     
         _delete_word(startNode, word)
         self.refresh_tree()
+
+        if word == 'cute':
+            self.print_tree(self.root_)
         
         return return_value
 
@@ -236,6 +247,9 @@ class TernarySearchTreeDictionary(BaseDictionary):
         # Return if prefix not found.
         except TypeError:
             return return_list
+        # If prefix is a word itself, add it to the list.
+        if prefixes_suffix.end_word:
+            return_list.append(WordFrequency(word, prefixes_suffix.frequency))
 
         def recursive_search(curr: Node, w):
             # If end of the tree is reached, return.
@@ -299,9 +313,9 @@ def debug():
 
     tst = TernarySearchTreeDictionary()
     tst.build_dictionary(wf_dict)
-    tst.delete_word('app')
-    # [print(x.word, x.frequency) for x in tst.autocomplete('cu')]
+    # tst.delete_word('app')
     tst.print_tree(curr_=tst.root_)
+    [print(x.word, x.frequency) for x in tst.autocomplete('cut')]
 
 
 if __name__ == '__main__':
