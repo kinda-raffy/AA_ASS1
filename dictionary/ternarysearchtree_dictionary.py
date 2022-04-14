@@ -40,22 +40,24 @@ class TernarySearchTreeDictionary(BaseDictionary):
         for word_frequency in words_frequencies:
             self.add_word_frequency(word_frequency)
 
-        self.print_tree(self.root_)
+        # self.print_tree(self.root_)
 
     # @log_computation_time
-    def search(self, word: str, return_node=False) -> int:
+    def search(self, word: str, return_node=False, return_parent=False) -> int:
         """
         search for a word
         @param word: the word to be searched
         @return: frequency > 0 if found and 0 if NOT found
         """
+        curr = self.root_
+        parent = None
         # Return 0 if the tree or word is empty.
         if self.root_ is None or word == '':
             return 0
         dict_word = ''
         letter_index = 0
         letter = word[letter_index]
-        curr = self.root_
+
         # Search for the word.
         while curr is not None:
             # If the current letter is the same as the word, add it to the dictionary word and explore middle.
@@ -63,19 +65,24 @@ class TernarySearchTreeDictionary(BaseDictionary):
                 dict_word += letter
                 # If the word has been built, return the frequency.
                 if dict_word == word and (curr.end_word if not return_node else True):
-                    return curr.frequency if not return_node else (curr.frequency, curr)
+                    return curr.frequency if not return_node else (curr.frequency, curr)\
+                    if not return_parent else (curr.frequency, curr, parent)
                 letter_index += 1
                 try:
                     letter = word[letter_index]
                 except IndexError:
                     return 0
+                parent = curr
                 curr = curr.middle
             # If the letter is smaller than the current letter, go left.
             elif letter < curr.letter:
+                parent = curr
                 curr = curr.left
             # If the letter is greater than the current letter, go right.
             elif letter > curr.letter:
+                parent = curr
                 curr = curr.right
+            
         return 0
 
     def add_word_frequency(self, word_frequency: WordFrequency) -> bool:
@@ -177,7 +184,7 @@ class TernarySearchTreeDictionary(BaseDictionary):
         if word == '':
             return False
 
-        def _delete_word(curr: Node, letters) -> bool:
+        def _delete_word(curr: Node, parent: Node, letters) -> bool:
 
             # If this node is empty, it counts as deleted.
             if curr is None:
@@ -190,23 +197,24 @@ class TernarySearchTreeDictionary(BaseDictionary):
             # if this node is th next part of the word
             if curr.letter == letters[0]:
                 if len(letters) == 1:
-                    valid = _delete_word(curr.middle, "")
+                    valid = _delete_word(curr.middle, curr, "")
                 else:
                     # Try to delete middle
-                    valid = _delete_word(curr.middle, letters[1:])
+                    valid = _delete_word(curr.middle, curr, letters[1:])
                 if valid:
                     curr.middle = None
             else:
                 valid = False
 
-            if _delete_word(curr.left, letters):
+            if _delete_word(curr.left, curr, letters):
                 curr.left = None
             else:
                 valid = False
-            if _delete_word(curr.right, letters):
+            if _delete_word(curr.right, curr, letters):
                 curr.right = None
             else:
                 valid = False
+
             
             # if L,M,R all deleted or None and this is part of word
             if valid:
@@ -218,11 +226,15 @@ class TernarySearchTreeDictionary(BaseDictionary):
             else:
                 return False
 
-        _, startNode = self.search(word[0], return_node=True)
+        try:
+            _, startNode, startParent = self.search(word[0], return_node=True, return_parent=True)
+        except(TypeError):
+            return False
+
         if startNode is None:
             return False
     
-        _delete_word(startNode, word)
+        _delete_word(startNode, startParent, word)
         self.refresh_tree()
 
         if word == 'cute':
