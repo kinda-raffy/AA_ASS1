@@ -1,5 +1,6 @@
 from dictionary.word_frequency import WordFrequency
 from dictionary.base_dictionary import BaseDictionary
+from dictionary.ternarysearchtree_dictionary import log_computation_time
 
 
 # ------------------------------------------------------------------------
@@ -15,6 +16,7 @@ class ListDictionary(BaseDictionary):
     def __init__(self):
         self.dictionary = []
 
+    @log_computation_time
     def build_dictionary(self, words_frequencies: [WordFrequency]):
         """
         construct the data structure to store nodes
@@ -23,6 +25,7 @@ class ListDictionary(BaseDictionary):
         for word_frequency in words_frequencies:
             self.dictionary.append(word_frequency)
 
+    @log_computation_time
     def search(self, word: str) -> int:
         """
         search for a word
@@ -47,6 +50,7 @@ class ListDictionary(BaseDictionary):
             return True
         return False
 
+    @log_computation_time
     def delete_word(self, word: str) -> bool:
         """
         delete a word from the dictionary
@@ -61,6 +65,7 @@ class ListDictionary(BaseDictionary):
                     return True
         return False
 
+    @log_computation_time
     def autocomplete(self, prefix_word: str) -> [WordFrequency]:
         """
         return a list of 3 most-frequent words in the dictionary that have 'prefix_word' as a prefix
