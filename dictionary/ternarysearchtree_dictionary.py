@@ -1,5 +1,6 @@
 from treelib import Node, Tree
 from termcolor import colored as c, cprint
+import inspect
 import time
 
 from dictionary.base_dictionary import BaseDictionary
@@ -22,7 +23,6 @@ def log_computation_time(func):
         cprint(f"{c(' TST ', 'cyan', attrs=['bold', 'reverse'])} {c('Computation time', 'magenta')} of"
                f" '{c(func.__name__, 'yellow')}': {c(str(end - start), 'green')}", attrs=['bold'])
         return result
-
     return wrapper
 
 
@@ -32,7 +32,7 @@ class TernarySearchTreeDictionary(BaseDictionary):
     def __init__(self):
         self.root_ = None
 
-    @log_computation_time
+    # @log_computation_time
     def build_dictionary(self, words_frequencies: [WordFrequency]):
         """
         construct the data structure to store nodes
@@ -146,7 +146,7 @@ class TernarySearchTreeDictionary(BaseDictionary):
             parent = current
         return True
 
-    @log_computation_time
+    # @log_computation_time
     def delete_word(self, word: str) -> bool:
         """
         delete a word from the dictionary
@@ -217,7 +217,7 @@ class TernarySearchTreeDictionary(BaseDictionary):
         _delete_word(start_node, start_parent, word)
         return return_value
 
-    @log_computation_time
+    # @log_computation_time
     def autocomplete(self, word: str) -> [WordFrequency]:
         """
         return a list of 3 most-frequent words in the dictionary that have 'word' as a prefix

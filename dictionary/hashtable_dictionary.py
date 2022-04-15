@@ -1,3 +1,5 @@
+import time
+from termcolor import colored as c, cprint
 from dictionary.word_frequency import WordFrequency
 from dictionary.base_dictionary import BaseDictionary
 
@@ -9,12 +11,24 @@ from dictionary.base_dictionary import BaseDictionary
 # __copyright__ = 'Copyright 2022, RMIT University'
 # ------------------------------------------------------------------------
 
+def log_computation_time(func):
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        end = time.perf_counter()
+        cprint(f"{c(' HASH ', 'cyan', attrs=['bold', 'reverse'])} {c('Computation time', 'magenta')} of"
+               f" '{c(func.__name__, 'yellow')}': {c(str(end - start), 'green')}", attrs=['bold'])
+        return result
+    return wrapper
+
+
 class HashTableDictionary(BaseDictionary):
     __slots__ = 'dictionary'
 
     def __init__(self):
         self.dictionary = {}
 
+    # @log_computation_time
     def build_dictionary(self, words_frequencies: [WordFrequency]):
         """
         construct the data structure to store nodes
@@ -23,6 +37,7 @@ class HashTableDictionary(BaseDictionary):
         for word_frequency in words_frequencies:
             self.add_word_frequency(word_frequency)
 
+    # @log_computation_time
     def search(self, word: str) -> int:
         """
         search for a word
@@ -44,6 +59,7 @@ class HashTableDictionary(BaseDictionary):
             return True
         return False
 
+    # @log_computation_time
     def delete_word(self, word: str) -> bool:
         """
         delete a word from the dictionary
@@ -55,6 +71,7 @@ class HashTableDictionary(BaseDictionary):
             return True
         return False
 
+    # @log_computation_time
     def autocomplete(self, word: str) -> [WordFrequency]:
         """
         return a list of 3 most-frequent words in the dictionary that have 'word' as a prefix
