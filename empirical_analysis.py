@@ -24,10 +24,10 @@ if __name__ == '__main__':
         sampleData = f.readlines()
         sampleData = [line.strip() for line in sampleData]
         sampleData = [WordFrequency(word=line.split()[0], frequency=int(line.split()[1])) for line in sampleData]
-
-        for i in range(14):
-            prev_size = 200000 // 2 ** (14 - (i - 1))
-            size = 200000 // 2 ** (14 - i)
+        
+        for i in range(16):
+            prev_size = 200000 // 2 ** (16 - (i - 1))
+            size = 200000 // 2 ** (16 - i)
             dictionaries[str(size + prev_size)] = sampleData[:size + prev_size]
 
     # Build dictionaries.
@@ -38,10 +38,10 @@ if __name__ == '__main__':
     listDictionary = ListDictionary()
     hashDictionary = HashTableDictionary()
     tstDictionary = TernarySearchTreeDictionary()
+    iterations = 10
     for key, value in dictionaries.items():
         print('Building dictionaries with size:', key)
         dict_sizes.append(key)
-
         start_time = time.perf_counter_ns()
         listDictionary.build_dictionary(value)
         end_time = time.perf_counter_ns()
@@ -56,6 +56,33 @@ if __name__ == '__main__':
         tstDictionary.build_dictionary(value)
         end_time = time.perf_counter_ns()
         tst_times.append(end_time - start_time)
+
+    for i in range(iterations-1):
+        print('Iteration', i+2)
+        for key, value in dictionaries.items():
+            iter = dict_sizes.index(key)
+            start_time = time.perf_counter_ns()
+            listDictionary.build_dictionary(value)
+            end_time = time.perf_counter_ns()
+            list_times[iter] = (list_times[iter] + end_time - start_time)
+
+            start_time = time.perf_counter_ns()
+            hashDictionary.build_dictionary(value)
+            end_time = time.perf_counter_ns()
+            hash_times[iter] = (hash_times[iter] + end_time - start_time)
+
+            start_time = time.perf_counter_ns()
+            tstDictionary.build_dictionary(value)
+            end_time = time.perf_counter_ns()
+            tst_times[iter] = (tst_times[iter] + end_time - start_time)
+
+    list_times = [i/iterations for i in list_times]
+    hash_times = [i/iterations for i in hash_times]
+    tst_times  = [i/iterations for i in  tst_times]
+    list_times.pop(0)
+    hash_times.pop(0)
+    tst_times.pop(0)
+    dict_sizes.pop(0)
 
     print(dict_sizes)
     print(list_times)
