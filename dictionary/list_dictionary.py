@@ -70,11 +70,10 @@ class ListDictionary(BaseDictionary):
         @return: whether succeeded, e.g. return False when point not found
         """
         # If word is in the dictionary than delete it from the dictionary.
-        if self.search(word) > 0:
-            for word_frequency in self.dictionary:
-                if word_frequency.word == word:
-                    self.dictionary.remove(word_frequency)
-                    return True
+        for word_frequency in self.dictionary:
+            if word_frequency.word == word:
+                self.dictionary.remove(word_frequency)
+                return True
         return False
 
     # @log_computation_time
